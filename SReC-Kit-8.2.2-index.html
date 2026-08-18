@@ -1,0 +1,160 @@
+<!doctype html><html lang="ms"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#2563eb"><style>
+*{box-sizing:border-box}body{margin:0;padding:16px;font-family:Segoe UI,Arial,sans-serif;background:linear-gradient(135deg,#eff6ff,#f8fafc);color:#172033}.app{max-width:980px;margin:auto}.card{background:#fff;border-radius:20px;padding:16px;margin:12px 0;box-shadow:0 8px 25px #0000000b}header{text-align:center}.logo{font-size:44px}h1{margin:0;color:#1e3a8a}header p{color:#64748b}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}label{font-size:13px;font-weight:700;color:#475569}input,select{display:block;width:100%;margin-top:6px;padding:11px;border:2px solid #cbd5e1;border-radius:11px;background:#fff}.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:15px 0}.tab{border:0;border-radius:12px;padding:12px;font-weight:800;background:#e2e8f0}.tab.active{background:#2563eb;color:#fff}.panel{display:none}.panel.active{display:block}.tones{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.tone{border:0;border-radius:12px;padding:11px;font-weight:800}.tone.active{outline:3px solid #172033}.t1{background:#e0f2fe;color:#0369a1}.t2{background:#dcfce7;color:#15803d}.t3{background:#fef9c3;color:#a16207}.t4{background:#fee2e2;color:#b91c1c}.target{text-align:center}.target small{color:#64748b}.hanzi{font-size:50px;font-weight:900}.pinyin{font-size:43px;font-weight:900;color:#1e3a8a}.graph{padding:8px}canvas{width:100%;height:300px;background:#0f172a;border-radius:15px;display:block}.legend{display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-top:7px}.progress{height:9px;background:#e2e8f0;border-radius:20px;overflow:hidden}.progress span{display:block;width:0;height:100%;background:#2563eb}.status{text-align:center;min-height:25px;font-weight:700;color:#475569}.center{text-align:center}.primary{border:0;border-radius:13px;padding:14px 25px;background:#2563eb;color:#fff;font-size:16px;font-weight:800}.hidden{display:none!important}.syll{padding:12px;border-radius:12px;margin:8px 0;background:#f8fafc}.good{border-left:6px solid #22c55e}.warn{border-left:6px solid #f59e0b}.bad{border-left:6px solid #ef4444}.advice{margin-top:10px;padding:12px;border-radius:12px;background:#eff6ff;color:#1e40af;font-weight:700}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#fff;border-radius:15px;padding:14px;text-align:center}.stat b{display:block;font-size:23px}table{width:100%;border-collapse:collapse}th,td{padding:9px;border-bottom:1px solid #e2e8f0;text-align:center;font-size:13px}th{background:#eef2ff}.tools{display:flex;gap:8px;flex-wrap:wrap}.secondary{border:0;border-radius:10px;padding:10px 14px;background:#e2e8f0;font-weight:700}.hero{text-align:center}.compare{display:grid;grid-template-columns:1fr auto 1fr 1fr;gap:8px;align-items:center;text-align:center}.compare div{background:#f8fafc;padding:12px;border-radius:12px}.compare b{display:block;font-size:25px;color:#1e3a8a}footer{text-align:center;color:#94a3b8;font-size:12px;padding:20px}@media(max-width:650px){.grid2{grid-template-columns:1fr}.tones{gap:4px}.tone{font-size:12px;padding:9px 2px}.hanzi{font-size:43px}.pinyin{font-size:37px}.stats{grid-template-columns:1fr 1fr 1fr}.compare{grid-template-columns:1fr 1fr}}
+</style>
+<title>SReC-Kit 8.2.2.2</title></head><body><main class="app">
+<header><div class="logo">🎢</div><h1>SReC-Kit 8.2.2.2</h1><p>Adaptive Pinyin Tone Intervention</p></header>
+<section class="card grid2"><label>Nama Murid<input id="student" placeholder="Nama murid"></label><label>Kelas<input id="className" placeholder="Contoh: 3 Bestari"></label></section>
+<nav class="tabs"><button class="tab active" data-tab="practice">🎤 Latihan</button><button class="tab" data-tab="adaptive">🧩 Intervensi</button><button class="tab" data-tab="teacher">👩‍🏫 Dashboard</button></nav>
+
+<section id="practice" class="panel active">
+<div class="card"><label>Jenis latihan<select id="type"><option value="single">Satu suku kata</option><option value="word">Dua suku kata</option></select></label></div>
+<div id="tones" class="tones"><button class="tone t1 active" data-tone="1">一声<br>Nada 1</button><button class="tone t2" data-tone="2">二声<br>Nada 2</button><button class="tone t3" data-tone="3">三声<br>Nada 3</button><button class="tone t4" data-tone="4">四声<br>Nada 4</button></div>
+<div id="wordPick" class="card hidden"><label>Pilih perkataan<select id="wordSelect"></select></label></div>
+<div class="target card"><small>SASARAN</small><div id="hanzi" class="hanzi">妈</div><div id="pinyin" class="pinyin">mā</div><b id="sequence">Nada 1</b></div>
+<div class="card graph"><canvas id="canvas"></canvas><div class="legend"><span>Putus = sasaran</span><span>Putih = suara murid</span></div></div>
+<div class="progress"><span id="bar"></span></div><p id="status" class="status">Tekan “Mula Sebut”.</p>
+<div class="center"><button id="start" class="primary">🎤 Mula Sebut</button></div>
+<div id="analysis" class="card hidden"><h2>🧠 Analisis</h2><div id="syllableResults"></div><div class="advice" id="advice">—</div></div>
+</section>
+
+<section id="adaptive" class="panel">
+<div class="card hero"><small>LATIHAN ADAPTIF</small><h2 id="adaptiveTitle">Belum ada sasaran intervensi</h2><p id="adaptiveDesc">Buat sekurang-kurangnya satu latihan dahulu. Sistem akan memilih semula bahagian yang paling lemah.</p><button id="adaptiveStart" class="primary">▶️ Mula Latihan Pemulihan</button></div>
+<div class="card"><h2>📈 Sebelum vs Selepas</h2><div class="compare"><div><small>Sebelum</small><b id="before">—</b></div><div>→</div><div><small>Selepas</small><b id="after">—</b></div><div><small>Peningkatan</small><b id="gain">—</b></div></div></div>
+<div class="card"><h2>🎯 Sasaran Semasa</h2><p id="targetIntervention">—</p></div>
+</section>
+
+<section id="teacher" class="panel">
+<div class="stats"><div class="stat">Purata<b id="avg">0%</b></div><div class="stat">Latihan<b id="attempts">0</b></div><div class="stat">Perlu intervensi<b id="needs">0</b></div></div>
+<div class="card"><h2>📊 Penguasaan Nada</h2><table><thead><tr><th>Nada</th><th>Latihan</th><th>Purata</th><th>Status</th></tr></thead><tbody>
+<tr><td>1</td><td id="n1">0</td><td id="s1">0%</td><td id="st1">Belum diuji</td></tr><tr><td>2</td><td id="n2">0</td><td id="s2">0%</td><td id="st2">Belum diuji</td></tr><tr><td>3</td><td id="n3">0</td><td id="s3">0%</td><td id="st3">Belum diuji</td></tr><tr><td>4</td><td id="n4">0</td><td id="s4">0%</td><td id="st4">Belum diuji</td></tr>
+</tbody></table></div>
+<div class="card"><h2>⚠️ Perkataan / Nada Lemah</h2><div id="weak">Belum ada data.</div></div>
+<div class="card"><h2>🔄 Impak Intervensi</h2><div id="impact">Belum ada data.</div></div>
+<div class="tools"><button class="secondary" id="export">📄 Simpan Laporan</button><button class="secondary" id="reset">♻️ Reset</button></div>
+</section><footer>SReC-Kit 8.2.2.2 · Prototaip PWA Pendidikan</footer></main>
+<script>
+const WORDS=[{id:"mama",h:"妈妈",p:"māma",t:[1,1],topic:"Keluarga"},{id:"baba",h:"爸爸",p:"bàba",t:[4,4],topic:"Keluarga"},{id:"laoshi",h:"老师",p:"lǎoshī",t:[3,1],topic:"Sekolah"},{id:"xuexiao",h:"学校",p:"xuéxiào",t:[2,4],topic:"Sekolah"},{id:"xuesheng",h:"学生",p:"xuéshēng",t:[2,1],topic:"Sekolah"},{id:"pingguo",h:"苹果",p:"píngguǒ",t:[2,3],topic:"Makanan"},{id:"nihao",h:"你好",p:"nǐhǎo",t:[3,3],topic:"Sapaan"}];
+let words=WORDS,data=JSON.parse(localStorage.getItem("srec83Data")||"{}"),tone=1,current=words[0],running=false,startTime=0,history=[],audioCtx,analyser,stream,raf;
+const RECORD_MS=6000,C=document.getElementById("canvas"),X=C.getContext("2d");
+function save(){localStorage.setItem("srec83Data",JSON.stringify(data))}
+function resize(){C.width=C.clientWidth*devicePixelRatio;C.height=C.clientHeight*devicePixelRatio;X.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);draw()}addEventListener("resize",resize);
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.getElementById(b.dataset.tab).classList.add("active")});
+document.querySelectorAll(".tone").forEach(b=>b.onclick=()=>{tone=+b.dataset.tone;document.querySelectorAll(".tone").forEach(x=>x.classList.remove("active"));b.classList.add("active");updateSingle();history=[];draw()});
+document.getElementById("type").onchange=()=>{let w=document.getElementById("type").value==="word";document.getElementById("tones").classList.toggle("hidden",w);document.getElementById("wordPick").classList.toggle("hidden",!w);if(w)updateWord();else updateSingle();history=[];draw()};
+document.getElementById("wordSelect").onchange=e=>{current=words.find(w=>w.id===e.target.value)||words[0];updateWord();history=[];draw()};
+document.getElementById("start").onclick=()=>running?stopRecording():startRecording();
+document.getElementById("adaptiveStart").onclick=adaptiveStart;
+document.getElementById("export").onclick=exportReport;
+document.getElementById("reset").onclick=()=>{if(confirm("Padam semua data?")){data={};save();updateDashboard();updateAdaptive()}};
+function fillWords(){document.getElementById("wordSelect").innerHTML=words.map(w=>`<option value="${w.id}">${w.h} — ${w.p} (${w.topic})</option>`).join("")}
+function updateSingle(){let h=["妈","麻","马","骂"],p=["mā","má","mǎ","mà"];document.getElementById("hanzi").textContent=h[tone-1];document.getElementById("pinyin").textContent=p[tone-1];document.getElementById("sequence").textContent="Nada "+tone}
+function updateWord(){document.getElementById("hanzi").textContent=current.h;document.getElementById("pinyin").textContent=current.p;document.getElementById("sequence").textContent="Nada "+current.t.join(" → ")}
+function seq(){return document.getElementById("type").value==="word"?current.t:[tone]}
+function target(t,x){if(t===1)return .78;if(t===2)return .35+.55*x;if(t===3)return x<.55?.75-.45*x/.55:.30+.48*(x-.55)/.45;return .88-.68*x}
+function norm(f){return Math.max(0,Math.min(1,(f-70)/450))}
+function percentile(a,q){if(!a.length)return 0;let b=[...a].sort((x,y)=>x-y),i=(b.length-1)*q,j=Math.floor(i),r=i-j;return b[j]+(b[j+1]===undefined?0:r*(b[j+1]-b[j]))}
+function contourNormalize(points){if(points.length<2)return points;let fs=points.map(p=>p.f),lo=percentile(fs,.10),hi=percentile(fs,.90);if(hi-lo<8){lo=Math.min(...fs)-4;hi=Math.max(...fs)+4}return points.map(p=>({...p,n:Math.max(0,Math.min(1,(p.f-lo)/(hi-lo)))}))}
+function medianSmooth(points,win=3){if(points.length<3)return points;return points.map((p,i)=>{let a=[];for(let j=Math.max(0,i-win);j<=Math.min(points.length-1,i+win);j++)a.push(points[j].f);a.sort((x,y)=>x-y);return {...p,f:a[Math.floor(a.length/2)]}})}
+function draw(){let w=C.clientWidth,h=C.clientHeight,s=seq();X.fillStyle="#0f172a";X.fillRect(0,0,w,h);X.strokeStyle="#ffffff14";X.lineWidth=1;for(let i=0;i<6;i++){let y=25+i*(h-50)/5;X.beginPath();X.moveTo(0,y);X.lineTo(w,y);X.stroke()}X.setLineDash([7,7]);X.strokeStyle="#ffffff66";X.lineWidth=3;X.beginPath();for(let i=0;i<=160;i++){let z=i/160*s.length,ix=Math.min(s.length-1,Math.floor(z)),local=z-ix,x=i/160*w,y=25+(1-target(s[ix],local))*(h-50);i?X.lineTo(x,y):X.moveTo(x,y)}X.stroke();X.setLineDash([]);if(history.length){
+  const hp=contourNormalize(medianSmooth(stabilizePitch(history)));
+  X.strokeStyle="#fff";X.lineWidth=3.5;X.lineJoin="round";X.lineCap="round";X.beginPath();
+  hp.forEach((p,i)=>{let x=p.t*w,y=25+(1-norm(p.f))*(h-50);i?X.lineTo(x,y):X.moveTo(x,y)});
+  X.stroke();
+  X.fillStyle="#fff";
+  hp.forEach(p=>{let x=p.t*w,y=25+(1-norm(p.f))*(h-50);X.beginPath();X.arc(x,y,1.8,0,Math.PI*2);X.fill()});
+}}
+function autocorrelate(buf,sr){
+  let rms=0;
+  for(let v of buf) rms+=v*v;
+  rms=Math.sqrt(rms/buf.length);
+  if(rms<0.012)return {f:-1,c:0};
+
+  let mean=0;
+  for(let v of buf)mean+=v;
+  mean/=buf.length;
+
+  const x=new Float32Array(buf.length);
+  for(let i=0;i<buf.length;i++)x[i]=buf[i]-mean;
+
+  const minLag=Math.floor(sr/420);
+  const maxLag=Math.min(Math.floor(sr/85),x.length-2);
+  let bestLag=-1,best=-1,second=-1;
+
+  for(let lag=minLag;lag<=maxLag;lag++){
+    let sum=0,e1=0,e2=0;
+    for(let i=0;i<x.length-lag;i++){
+      const a=x[i],b=x[i+lag];
+      sum+=a*b;e1+=a*a;e2+=b*b;
+    }
+    const corr=sum/Math.sqrt(e1*e2+1e-12);
+    if(corr>best){second=best;best=corr;bestLag=lag;}
+    else if(corr>second)second=corr;
+  }
+
+  if(bestLag<0 || best<0.35 || best-second<0.01)return {f:-1,c:0};
+
+  // Parabolic interpolation around the best lag for a smoother frequency.
+  const lag=Math.max(minLag+1,Math.min(maxLag-1,bestLag));
+  function corrAt(L){
+    let sum=0,e1=0,e2=0;
+    for(let i=0;i<x.length-L;i++){
+      const a=x[i],b=x[i+L];
+      sum+=a*b;e1+=a*a;e2+=b*b;
+    }
+    return sum/Math.sqrt(e1*e2+1e-12);
+  }
+  const y1=corrAt(lag-1),y2=corrAt(lag),y3=corrAt(lag+1);
+  const denom=(y1-2*y2+y3);
+  const shift=Math.abs(denom)>1e-8?0.5*(y1-y3)/denom:0;
+  const refined=lag+Math.max(-0.45,Math.min(0.45,shift));
+
+  return {f:sr/refined,c:best};
+}
+
+function stabilizePitch(points){
+  if(points.length<2)return points;
+  const out=[];
+  let prev=-1;
+
+  for(const p of points){
+    let f=p.f;
+    if(prev>0){
+      // Correct octave errors relative to the previous valid frame.
+      while(f/prev>1.75)f/=2;
+      while(f/prev<0.57)f*=2;
+
+      // IMPORTANT: never discard a point here.
+      // The old version discarded a sudden jump and then used the old
+      // previous value, which could cause all following points to be
+      // rejected. Keep the chronological data; median smoothing later
+      // removes isolated spikes.
+    }
+    out.push({...p,f});
+    prev=f;
+  }
+  return out;
+}
+
+function smooth(points){if(points.length<3)return points;return points.map((p,i)=>({...p,f:(points[Math.max(0,i-1)].f+p.f+points[Math.min(points.length-1,i+1)].f)/3}))}
+function findBoundary(points){if(points.length<12)return .5;let bins=48,e=Array(bins).fill(0),c=Array(bins).fill(0);points.forEach(p=>{let k=Math.min(bins-1,Math.floor(p.t*bins));e[k]+=Math.abs(p.f);c[k]++});for(let i=0;i<bins;i++)e[i]=c[i]?e[i]/c[i]:0;let best=24,min=Infinity;for(let i=10;i<38;i++)if(e[i]&&e[i]<=e[i-1]&&e[i]<=e[i+1]&&e[i]<min){min=e[i];best=i}return best/bins}
+async function startRecording(){try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==="suspended")await audioCtx.resume();analyser=audioCtx.createAnalyser();analyser.fftSize=2048;analyser.smoothingTimeConstant=.15;audioCtx.createMediaStreamSource(stream).connect(analyser);running=true;history=[];startTime=performance.now();document.getElementById("start").textContent="⏹️ Henti Rakaman";document.getElementById("analysis").classList.add("hidden");document.getElementById("status").textContent="🗣️ Sebut bunyi berterusan selama 6 saat: "+(document.getElementById("type").value==="word"?current.p:document.getElementById("pinyin").textContent);raf=requestAnimationFrame(loop)}catch(e){alert("Akses mikrofon gagal. Pastikan anda tekan Allow dan laman dibuka melalui HTTPS.")}}
+function loop(){if(!running)return;let b=new Float32Array(analyser.fftSize);analyser.getFloatTimeDomainData(b);let result=autocorrelate(b,audioCtx.sampleRate),elapsed=performance.now()-startTime,t=Math.min(1,elapsed/RECORD_MS);
+if(result.f>85&&result.f<420&&result.c>=0.35){
+  const last=history[history.length-1];
+  if(!last || t-last.t>=0.035) history.push({f:result.f,t});
+}document.getElementById("bar").style.width=t*100+"%";document.getElementById("status").textContent=`🎤 Sedang merakam… ${Math.max(0,Math.ceil((RECORD_MS-elapsed)/1000))} saat`;draw();if(elapsed>=RECORD_MS){finishRecording();return}raf=requestAnimationFrame(loop)}
+function stopRecording(){if(running)finishRecording()}
+function finishRecording(){if(!running)return;running=false;cancelAnimationFrame(raf);if(stream)stream.getTracks().forEach(x=>x.stop());if(audioCtx)audioCtx.close();document.getElementById("start").textContent="🔄 Cuba Lagi";document.getElementById("bar").style.width="100%";analyze()}
+function scoreSegment(points,toneNo){if(points.length<3)return 0;let err=0;points.forEach(p=>err+=Math.abs(target(toneNo,p.local)-norm(p.f)));return Math.max(0,Math.min(100,Math.round(100-(err/points.length)*130)))}
+function analyze(){history=stabilizePitch(history);if(history.length<8){document.getElementById("analysis").classList.remove("hidden");document.getElementById("syllableResults").innerHTML="<div class='syll bad'>⚠️ Pitch tidak cukup dikesan. Cuba sebut lebih kuat dan dekat dengan mikrofon.</div>";document.getElementById("advice").textContent="💡 Pastikan suara berterusan selama 2–4 saat dan elakkan terlalu jauh daripada mikrofon.";document.getElementById("status").textContent="⚠️ Rakaman selesai tetapi pitch terlalu sedikit.";return}let clean=medianSmooth(stabilizePitch(history),2),s=seq(),b=s.length===2?findBoundary(clean):1,parts=[];for(let i=0;i<s.length;i++){let lo=i?b:0,hi=i?1:b,vals=clean.filter(p=>p.t>=lo&&p.t<=hi).map(p=>({...p,local:(p.t-lo)/(hi-lo||1)}));parts.push({target:s[i],score:scoreSegment(vals,s[i])})}let avg=Math.round(parts.reduce((a,x)=>a+x.score,0)/parts.length),id=document.getElementById("type").value==="word"?current.id:"tone"+tone;data[id]=data[id]||{scores:[],parts:[]};data[id].scores.push(avg);parts.forEach((p,i)=>(data[id].parts[i]=data[id].parts[i]||[]).push(p.score));save();showAnalysis(parts,avg);updateDashboard();updateAdaptive()}
+function showAnalysis(parts,avg){document.getElementById("analysis").classList.remove("hidden");document.getElementById("syllableResults").innerHTML=parts.map((p,i)=>`<div class="syll ${p.score>=75?"good":p.score>=60?"warn":"bad"}"><b>Suku kata ${i+1}</b> · Nada ${p.target} · <b>${p.score}%</b><br>${p.score>=75?"✅ Tepat":p.score>=60?"⚠️ Perlu latihan":"❌ Fokus intervensi"}</div>`).join("");let w=parts.findIndex(p=>p.score<75);document.getElementById("advice").textContent=w<0?"🌟 Semua suku kata menunjukkan corak pic yang baik.":`💡 Suku kata ${w+1}: ${advice(parts[w].target)}`;document.getElementById("status").textContent="✅ Analisis selesai · "+avg+"%"}
+function advice(t){return t===1?"kekalkan pic tinggi dan rata.":t===2?"naikkan pic secara beransur-ansur.":t===3?"turunkan kemudian naikkan semula pic.":"jatuhkan pic dengan cepat dan jelas."}
+function findWeak(){let best=null;Object.keys(data).forEach(id=>{let a=data[id].scores||[];if(a.length){let av=a.reduce((x,y)=>x+y,0)/a.length;if(!best||av<best.av)best={id,av}}});return best}
+function updateAdaptive(){let w=findWeak();if(!w){document.getElementById("adaptiveTitle").textContent="Belum ada sasaran intervensi";document.getElementById("adaptiveDesc").textContent="Buat latihan diagnostik dahulu.";document.getElementById("targetIntervention").textContent="—";return}let word=words.find(x=>x.id===w.id),label=word?`${word.h} · ${word.p}`:w.id.replace("tone","Nada ");document.getElementById("adaptiveTitle").textContent="🎯 Fokus: "+label;document.getElementById("adaptiveDesc").textContent=`Purata semasa ${Math.round(w.av)}%. Sistem memilih item paling lemah untuk latihan pemulihan.`;document.getElementById("targetIntervention").textContent=word?`Latih semula ${word.h} (${word.p}) dan fokus pada corak nada ${word.t.join(" → ")}.`:`Latih semula ${label}`;let a=data[w.id].scores,b=a[0],c=a[a.length-1];document.getElementById("before").textContent=b+"%";document.getElementById("after").textContent=c+"%";document.getElementById("gain").textContent=(c-b>=0?"+":"")+(c-b)+" mata"}
+function adaptiveStart(){let w=findWeak();if(!w)return;let word=words.find(x=>x.id===w.id);if(word){current=word;document.getElementById("type").value="word";document.getElementById("tones").classList.add("hidden");document.getElementById("wordPick").classList.remove("hidden");fillWords();document.getElementById("wordSelect").value=word.id;updateWord()}else{tone=Number(w.id.replace("tone",""));document.getElementById("type").value="single";document.getElementById("tones").classList.remove("hidden");document.getElementById("wordPick").classList.add("hidden");document.querySelectorAll(".tone").forEach(x=>x.classList.toggle("active",+x.dataset.tone===tone));updateSingle()}document.querySelector('[data-tab="practice"]').click()}
+function updateDashboard(){let all=[],needs=0;for(let t=1;t<=4;t++){let a=data["tone"+t]?.scores||[],av=a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):0;document.getElementById("n"+t).textContent=a.length;document.getElementById("s"+t).textContent=av+"%";document.getElementById("st"+t).textContent=!a.length?"Belum diuji":av>=75?"Menguasai":av>=60?"Sedang berkembang":"Perlu intervensi";if(a.length&&av<60)needs++;all.push(...a)}let rows=[],imp=[];words.forEach(w=>{let a=data[w.id]?.scores||[];if(a.length){let av=Math.round(a.reduce((x,y)=>x+y,0)/a.length),gain=a[a.length-1]-a[0];rows.push(`<p><b>${w.h} · ${w.p}</b> — ${av}% · ${a.length} latihan</p>`);if(a.length>1)imp.push(`<p>${w.h}: ${a[0]}% → ${a[a.length-1]}% (${gain>=0?"+":""}${gain})</p>`);all.push(...a)}});let avg=all.length?Math.round(all.reduce((x,y)=>x+y,0)/all.length):0;document.getElementById("avg").textContent=avg+"%";document.getElementById("attempts").textContent=all.length;document.getElementById("needs").textContent=needs;document.getElementById("weak").innerHTML=rows.join("")||"Belum ada data.";document.getElementById("impact").innerHTML=imp.join("")||"Belum ada data intervensi berulang."}
+function exportReport(){let name=document.getElementById("student").value||"Murid",cls=document.getElementById("className").value||"-",text=`LAPORAN SReC-Kit 8.2.2.2\nNama: ${name}\nKelas: ${cls}\nPurata: ${document.getElementById("avg").textContent}\n\nIMPAK\n${document.getElementById("impact").innerText}`;let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type:"text/plain;charset=utf-8"}));a.download="Laporan_SReC_"+name.replace(/\s+/g,"_")+".txt";a.click()}
+fillWords();updateSingle();updateDashboard();updateAdaptive();resize();
+</script></body></html>
